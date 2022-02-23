@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_miarmapp/bloc/public_post/public_post_bloc.dart';
+import 'package:flutter_miarmapp/repository/post_repository/constants.dart';
 import 'package:flutter_miarmapp/widgets/home_app_bar.dart';
 import 'package:insta_like_button/insta_like_button.dart';
+
+import '../models/post_response.dart';
+import '../repository/post_repository/post_repository.dart';
+import '../repository/post_repository/post_repository_impl.dart';
+import '../widgets/error_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -10,6 +18,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late PostRepository postRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    postRepository = PostRepositoryImpl();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,11 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          post('assets/images/avatar.jpg', "Bojii"),
-          post('assets/images/avatar.jpg', "Bojii"),
-          post('assets/images/avatar.jpg', "Bojii"),
-          post('assets/images/avatar.jpg', "Bojii"),
-          post('assets/images/avatar.jpg', "Bojii"),
+          BlocProvider(
+              create: (context) {
+                return PostsBloc(postRepository)
+                  ..add(const FetchPostWithType());
+              },
+              child: _createSeePosts(context))
         ],
       ),
     );
@@ -151,7 +173,75 @@ Widget story(String image, name) {
   );
 }
 
-Widget post(String image, name) {
+Widget _createSeePosts(BuildContext context) {
+  return BlocBuilder<PostsBloc, PostsState>(
+    builder: (context, state) {
+      if (state is PostsInitial) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (state is PostFetchError) {
+        return ErrorPage(
+          message: state.message,
+          retry: () {
+            context.watch<PostsBloc>().add(const FetchPostWithType());
+          },
+        );
+      } else if (state is PostsFetched) {
+        return _createPublicView(context, state.posts);
+      } else {
+        return const Text('Not support');
+      }
+    },
+  );
+}
+
+Widget _createPublicView(BuildContext context, List<Post> posts) {
+  final contentWidth = MediaQuery.of(context).size.width;
+  final contentHeight = MediaQuery.of(context).size.height;
+
+  return ListView(
+    children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Text(
+              'Publicaciones',
+              style: TextStyle(
+                  color: Colors.black.withOpacity(.8),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 19),
+            ),
+          ),
+        ],
+      ),
+      SizedBox(
+        height: contentHeight - 170,
+        width: contentWidth,
+        child: ListView.separated(
+          itemBuilder: (BuildContext context, int index) {
+            return _createPublicViewItem(context, posts[index]);
+          },
+          scrollDirection: Axis.vertical,
+          separatorBuilder: (context, index) => VerticalDivider(
+            color: Colors.transparent,
+            width: contentWidth,
+          ),
+          itemCount: posts.length,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _createPublicViewItem(BuildContext context, Post post) {
+  final contentWidth = MediaQuery.of(context).size.width;
+  final contentHeight = MediaQuery.of(context).size.height;
+  String imageUrl =
+      post.file.replaceAll("http://localhost:8080", Constant.apiUrl);
+  String imageUrlAvatar =
+      post.userAvatar.replaceAll("http://localhost:8080", Constant.apiUrl);
+
   return Container(
     decoration: BoxDecoration(
         color: Colors.white,
@@ -165,7 +255,7 @@ Widget post(String image, name) {
               backgroundImage: AssetImage('assets/images/avatar.jpg'),
             ),
             title: Text(
-              name,
+              post.username,
               style: TextStyle(
                   color: Colors.black.withOpacity(.8),
                   fontWeight: FontWeight.w400,

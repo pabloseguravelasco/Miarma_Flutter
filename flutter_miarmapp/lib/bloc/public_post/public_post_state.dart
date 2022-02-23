@@ -1,6 +1,4 @@
-import 'package:equatable/equatable.dart';
-
-import '../../models/post_response.dart';
+part of 'public_post_bloc.dart';
 
 abstract class PostsState extends Equatable {
   const PostsState();
@@ -13,9 +11,8 @@ class PostsInitial extends PostsState {}
 
 class PostsFetched extends PostsState {
   final List<Post> posts;
-  final String type;
 
-  const PostsFetched(this.posts, this.type);
+  const PostsFetched(this.posts);
 
   @override
   List<Object> get props => [posts];

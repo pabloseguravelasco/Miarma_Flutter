@@ -1,8 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_miarmapp/bloc/public_post/public_post_event.dart';
-import 'package:flutter_miarmapp/bloc/public_post/public_post_state.dart';
 
+import '../../models/post_response.dart';
 import '../../repository/post_repository/post_repository.dart';
+
+part 'public_post_event.dart';
+part 'public_post_state.dart';
 
 class PostsBloc extends Bloc<PostsEvent, PostsState> {
   final PostRepository postRepository;
@@ -13,8 +16,8 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
 
   void _postsFetched(FetchPostWithType event, Emitter<PostsState> emit) async {
     try {
-      final posts = await postRepository.fetchPosts(event.type);
-      emit(PostsFetched(posts, event.type));
+      final posts = await postRepository.fetchPosts();
+      emit(PostsFetched(posts));
       return;
     } on Exception catch (e) {
       emit(PostFetchError(e.toString()));

@@ -1,4 +1,6 @@
-import 'dart:_http';
+import 'dart:io';
+
+import 'package:http/http.dart';
 import 'dart:convert';
 
 import 'package:flutter_miarmapp/repository/post_repository/post_repository.dart';

@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+part of 'public_post_bloc.dart';
 
 abstract class PostsEvent extends Equatable {
   const PostsEvent();
@@ -8,10 +8,8 @@ abstract class PostsEvent extends Equatable {
 }
 
 class FetchPostWithType extends PostsEvent {
-  final String type;
-
-  const FetchPostWithType(this.type);
+  const FetchPostWithType();
 
   @override
-  List<Object> get props => [type];
+  List<Object> get props => [];
 }
