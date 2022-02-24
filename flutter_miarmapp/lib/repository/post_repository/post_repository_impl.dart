@@ -7,7 +7,7 @@ import 'package:flutter_miarmapp/repository/post_repository/post_repository.dart
 import 'package:http/http.dart';
 
 import '../../models/post_response.dart';
-import 'constants.dart';
+import '../../constants.dart';
 
 class PostRepositoryImpl extends PostRepository {
   final Client _client = Client();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_miarmapp/bloc/public_post/public_post_bloc.dart';
-import 'package:flutter_miarmapp/repository/post_repository/constants.dart';
+import 'package:flutter_miarmapp/constants.dart';
 import 'package:flutter_miarmapp/widgets/home_app_bar.dart';
 import 'package:insta_like_button/insta_like_button.dart';
 
@@ -35,107 +35,108 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const HomeAppBar(),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Historias',
-                  style: TextStyle(
-                      color: Colors.black.withOpacity(.8),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 19),
-                ),
-                Row(
+      body: ListView(children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                'Historias',
+                style: TextStyle(
+                    color: Colors.black.withOpacity(.8),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 19),
+              ),
+              Row(
+                children: <Widget>[
+                  const Icon(
+                    Icons.arrow_right,
+                    size: 43,
+                  ),
+                  Text(
+                    'Ver Todas',
+                    style: TextStyle(
+                        color: Colors.black.withOpacity(.8),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 19),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.only(left: 15),
+          height: 100,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Column(
                   children: <Widget>[
-                    const Icon(
-                      Icons.arrow_right,
-                      size: 43,
+                    Stack(
+                      children: <Widget>[
+                        Container(
+                          width: 75,
+                          height: 75,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: AssetImage('assets/images/avatar.jpg'),
+                                  fit: BoxFit.cover)),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: -1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white)),
+                            child: const Icon(Icons.add, color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
                     ),
                     Text(
-                      'Ver Todas',
+                      'Mi Historia',
                       style: TextStyle(
                           color: Colors.black.withOpacity(.8),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 19),
-                    ),
+                          fontWeight: FontWeight.w500),
+                    )
                   ],
                 ),
-              ],
-            ),
+              ),
+              story(
+                'assets/images/avatar.jpg',
+                'Bojji',
+              ),
+              story(
+                'assets/images/avatar.jpg',
+                'Bojji',
+              ),
+              story('assets/images/avatar.jpg', 'Bojji'),
+              story('assets/images/avatar.jpg', 'Bojji'),
+              story('assets/images/avatar.jpg', 'Bojji'),
+            ],
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 15),
-            height: 122,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Column(
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            width: 75,
-                            height: 75,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    image:
-                                        AssetImage('assets/images/avatar.jpg'),
-                                    fit: BoxFit.cover)),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: -1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white)),
-                              child: const Icon(Icons.add, color: Colors.white),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'Mi Historia',
-                        style: TextStyle(
-                            color: Colors.black.withOpacity(.8),
-                            fontWeight: FontWeight.w500),
-                      )
-                    ],
-                  ),
-                ),
-                story(
-                  'assets/images/avatar.jpg',
-                  'Bojii',
-                ),
-                story(
-                  'assets/images/avatar.jpg',
-                  'Bojii',
-                ),
-                story('assets/images/avatar.jpg', 'Bojii'),
-                story('assets/images/avatar.jpg', 'Bojii'),
-                story('assets/images/avatar.jpg', 'Bojii'),
-              ],
-            ),
-          ),
-          BlocProvider(
+        ),
+        SizedBox(
+          width: 800,
+          height: 800,
+          child: BlocProvider(
               create: (context) {
                 return PostsBloc(postRepository)
                   ..add(const FetchPostWithType());
               },
-              child: _createSeePosts(context))
-        ],
-      ),
+              child: _createSeePosts(context)),
+        ),
+      ]),
     );
   }
 }
@@ -234,6 +235,8 @@ Widget _createPublicView(BuildContext context, List<Post> posts) {
   );
 }
 
+//PUEDO IMPLEMENTARLO EN LA HOME_SCREEN?ERROR ListView infinite size
+
 Widget _createPublicViewItem(BuildContext context, Post post) {
   final contentWidth = MediaQuery.of(context).size.width;
   final contentHeight = MediaQuery.of(context).size.height;
@@ -251,22 +254,22 @@ Widget _createPublicViewItem(BuildContext context, Post post) {
       children: <Widget>[
         Container(
           child: ListTile(
-            leading: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/avatar.jpg'),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(imageUrlAvatar),
             ),
             title: Text(
               post.username,
               style: TextStyle(
                   color: Colors.black.withOpacity(.8),
-                  fontWeight: FontWeight.w400,
-                  fontSize: 21),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18),
             ),
             trailing: const Icon(Icons.more_vert),
           ),
         ),
         InstaLikeButton(
-          image: AssetImage(
-            'assets/images/avatar.jpg',
+          image: NetworkImage(
+            imageUrl,
           ),
           width: double.infinity,
           onChanged: () {},
