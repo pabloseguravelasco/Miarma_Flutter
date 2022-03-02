@@ -21,7 +21,7 @@ class PostRepositoryImpl extends PostRepository {
       HttpHeaders.authorizationHeader: "Bearer $token"
     });
     if (response.statusCode == 200) {
-      return PostResponse.fromJson(json.decode(response.body)).content;
+      return PostsResponse.fromJson(json.decode(response.body)).content;
     } else {
       throw Exception('Fail to load posts');
     }

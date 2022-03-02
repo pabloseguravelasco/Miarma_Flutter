@@ -1,5 +1,5 @@
-class PostResponse {
-  PostResponse({
+class PostsResponse {
+  PostsResponse({
     required this.content,
     required this.pageable,
     required this.last,
@@ -24,7 +24,7 @@ class PostResponse {
   late final int numberOfElements;
   late final bool empty;
 
-  PostResponse.fromJson(Map<String, dynamic> json) {
+  PostsResponse.fromJson(Map<String, dynamic> json) {
     content = List.from(json['content']).map((e) => Post.fromJson(e)).toList();
     pageable = Pageable.fromJson(json['pageable']);
     last = json['last'];
@@ -58,40 +58,89 @@ class PostResponse {
 class Post {
   Post({
     required this.id,
-    required this.message,
-    required this.file,
-    required this.resizedFile,
-    required this.userFullName,
-    required this.username,
-    required this.userAvatar,
+    required this.titulo,
+    required this.usuario,
+    required this.texto,
+    required this.ficheroAdjunto,
+    required this.ficheroAdjuntoResized,
+    required this.publica,
   });
-  late final String id;
-  late final String message;
-  late final String file;
-  late final String resizedFile;
-  late final String userFullName;
-  late final String username;
-  late final String userAvatar;
+  late final int id;
+  late final String titulo;
+  late final UsuarioDTO usuario;
+  late final String texto;
+  late final String ficheroAdjunto;
+  late final String ficheroAdjuntoResized;
+  late final bool publica;
 
   Post.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    message = json['message'];
-    file = json['file'];
-    resizedFile = json['resizedFile'];
-    userFullName = json['userFullName'];
-    username = json['username'];
-    userAvatar = json['userAvatar'];
+    titulo = json['titulo'];
+    usuario = UsuarioDTO.fromJson(json['usuario']);
+    texto = json['texto'];
+    ficheroAdjunto = json['ficheroAdjunto'];
+    ficheroAdjuntoResized = json['ficheroAdjuntoResized'];
+    publica = json['publica'];
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['id'] = id;
-    _data['message'] = message;
-    _data['file'] = file;
-    _data['resizedFile'] = resizedFile;
-    _data['userFullName'] = userFullName;
-    _data['username'] = username;
-    _data['userAvatar'] = userAvatar;
+    _data['titulo'] = titulo;
+    _data['usuario'] = usuario.toJson();
+    _data['texto'] = texto;
+    _data['ficheroAdjunto'] = ficheroAdjunto;
+    _data['ficheroAdjuntoResized'] = ficheroAdjuntoResized;
+    _data['publica'] = publica;
+    return _data;
+  }
+}
+
+class UsuarioDTO {
+  UsuarioDTO({
+    required this.nick,
+    required this.nombre,
+    required this.fechaDeNacimiento,
+    required this.numeroSeguidores,
+    required this.numeroSeguidos,
+    required this.numeroPublicaciones,
+    required this.email,
+    required this.avatar,
+    required this.perfilPublico,
+  });
+  late final String nick;
+  late final String nombre;
+  late final String fechaDeNacimiento;
+  late final int numeroSeguidores;
+  late final int numeroSeguidos;
+  late final int numeroPublicaciones;
+  late final String email;
+  late final String avatar;
+  late final bool perfilPublico;
+
+  UsuarioDTO.fromJson(Map<String, dynamic> json) {
+    nick = json['nick'];
+    nombre = json['nombre'];
+    fechaDeNacimiento = json['fechaDeNacimiento'];
+    numeroSeguidores = json['numeroSeguidores'];
+    numeroSeguidos = json['numeroSeguidos'];
+    numeroPublicaciones = json['numeroPublicaciones'];
+    email = json['email'];
+    avatar = json['avatar'];
+    perfilPublico = json['perfilPublico'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['nick'] = nick;
+    _data['nombre'] = nombre;
+    _data['fechaDeNacimiento'] = fechaDeNacimiento;
+    _data['numeroSeguidores'] = numeroSeguidores;
+    _data['numeroSeguidos'] = numeroSeguidos;
+    _data['numeroPublicaciones'] = numeroPublicaciones;
+    _data['email'] = email;
+    _data['avatar'] = avatar;
+    _data['perfilPublico'] = perfilPublico;
     return _data;
   }
 }
@@ -100,23 +149,23 @@ class Pageable {
   Pageable({
     required this.sort,
     required this.offset,
-    required this.pageNumber,
     required this.pageSize,
+    required this.pageNumber,
     required this.unpaged,
     required this.paged,
   });
   late final Sort sort;
   late final int offset;
-  late final int pageNumber;
   late final int pageSize;
+  late final int pageNumber;
   late final bool unpaged;
   late final bool paged;
 
   Pageable.fromJson(Map<String, dynamic> json) {
     sort = Sort.fromJson(json['sort']);
     offset = json['offset'];
-    pageNumber = json['pageNumber'];
     pageSize = json['pageSize'];
+    pageNumber = json['pageNumber'];
     unpaged = json['unpaged'];
     paged = json['paged'];
   }
@@ -125,8 +174,8 @@ class Pageable {
     final _data = <String, dynamic>{};
     _data['sort'] = sort.toJson();
     _data['offset'] = offset;
-    _data['pageNumber'] = pageNumber;
     _data['pageSize'] = pageSize;
+    _data['pageNumber'] = pageNumber;
     _data['unpaged'] = unpaged;
     _data['paged'] = paged;
     return _data;

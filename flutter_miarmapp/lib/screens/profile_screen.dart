@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_miarmapp/constants.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -70,8 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Container(
                             child: new CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  "https://somoskudasai.com/wp-content/uploads/2021/12/portada_ousama-ranking-9.jpg"),
+                              // backgroundImage: NetworkImage(imageUrlAvatar),
                               radius: 55.0,
                             ),
                           ),

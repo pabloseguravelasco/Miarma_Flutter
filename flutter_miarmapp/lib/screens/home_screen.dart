@@ -235,15 +235,13 @@ Widget _createPublicView(BuildContext context, List<Post> posts) {
   );
 }
 
-//PUEDO IMPLEMENTARLO EN LA HOME_SCREEN?ERROR ListView infinite size
-
 Widget _createPublicViewItem(BuildContext context, Post post) {
   final contentWidth = MediaQuery.of(context).size.width;
   final contentHeight = MediaQuery.of(context).size.height;
-  String imageUrl =
-      post.file.replaceAll("http://localhost:8080", Constant.apiUrl);
+  String imageUrl = post.ficheroAdjuntoResized
+      .replaceAll("http://localhost:8080", Constant.apiUrl);
   String imageUrlAvatar =
-      post.userAvatar.replaceAll("http://localhost:8080", Constant.apiUrl);
+      post.usuario.avatar.replaceAll("http://localhost:8080", Constant.apiUrl);
 
   return Container(
     decoration: BoxDecoration(
@@ -258,7 +256,7 @@ Widget _createPublicViewItem(BuildContext context, Post post) {
               backgroundImage: NetworkImage(imageUrlAvatar),
             ),
             title: Text(
-              post.username,
+              post.usuario.nick,
               style: TextStyle(
                   color: Colors.black.withOpacity(.8),
                   fontWeight: FontWeight.w500,
