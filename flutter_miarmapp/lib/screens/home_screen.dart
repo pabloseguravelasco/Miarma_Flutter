@@ -127,15 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SizedBox(
-          width: 800,
-          height: 800,
-          child: BlocProvider(
+            width: 800,
+            height: 800,
+            child: BlocProvider(
               create: (context) {
                 return PostsBloc(postRepository)
                   ..add(const FetchPostWithType());
               },
-              child: _createSeePosts(context)),
-        ),
+              child: Scaffold(body: _createSeePosts(context)),
+            )),
       ]),
     );
   }
@@ -238,8 +238,8 @@ Widget _createPublicView(BuildContext context, List<Post> posts) {
 Widget _createPublicViewItem(BuildContext context, Post post) {
   final contentWidth = MediaQuery.of(context).size.width;
   final contentHeight = MediaQuery.of(context).size.height;
-  String imageUrl = post.ficheroAdjuntoResized
-      .replaceAll("http://localhost:8080", Constant.apiUrl);
+  String imageUrl =
+      post.ficheroAdjunto.replaceAll("http://localhost:8080", Constant.apiUrl);
   String imageUrlAvatar =
       post.usuario.avatar.replaceAll("http://localhost:8080", Constant.apiUrl);
 

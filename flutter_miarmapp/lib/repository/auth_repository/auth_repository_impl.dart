@@ -12,14 +12,12 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<LoginResponse> login(LoginDto loginDto) async {
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
     final response =
-        await Future.delayed(const Duration(milliseconds: 4000), () {
-      return _client.post(Uri.parse('${Constant.apiUrl}/auth/login'),
-          headers: headers, body: jsonEncode(loginDto.toJson()));
-    });
+        await _client.post(Uri.parse("${Constant.apiUrl}/auth/login"),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode(loginDto.toJson()));
     if (response.statusCode == 201) {
       return LoginResponse.fromJson(json.decode(response.body));
     } else {

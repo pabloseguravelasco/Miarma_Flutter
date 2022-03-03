@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_miarmapp/bloc/login/login_bloc.dart';
 import 'package:flutter_miarmapp/models/login_dto.dart';
+import 'package:flutter_miarmapp/preferences_utils.dart';
 import 'package:flutter_miarmapp/repository/auth_repository/auth_repository.dart';
 import 'package:flutter_miarmapp/repository/auth_repository/auth_repository_impl.dart';
 import 'package:flutter_miarmapp/screens/menu_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
 
@@ -24,6 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     authRepository = AuthRepositoryImpl();
+    emailController.text = "pabloseguravelasco@gmail.com";
+    passwordController.text = "Pablo@123";
     super.initState();
   }
 
@@ -45,9 +49,12 @@ class _LoginScreenState extends State<LoginScreen> {
             child: BlocConsumer<LoginBloc, LoginState>(
                 listenWhen: (context, state) {
               return state is LoginSuccessState || state is LoginErrorState;
-            }, listener: (context, state) {
+            }, listener: (context, state) async {
               if (state is LoginSuccessState) {
-                // Shared preferences > guardo el token
+                final prefs = await SharedPreferences.getInstance();
+                
+                prefs.setString('token', state.loginResponse.token);
+                prefs.setString('avatar', state.loginResponse.avatar);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MenuScreen()),

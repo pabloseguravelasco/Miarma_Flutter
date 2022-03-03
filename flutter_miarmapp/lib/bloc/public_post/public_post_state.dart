@@ -5,6 +5,8 @@ abstract class PostsState extends Equatable {
 
   @override
   List<Object> get props => [];
+
+  get message => null;
 }
 
 class PostsInitial extends PostsState {}
