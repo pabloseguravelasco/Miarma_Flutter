@@ -6,8 +6,8 @@ import 'package:flutter_miarmapp/repository/register_repository/register_reposit
 import 'package:http/http.dart' as http;
 
 import '../../constants.dart';
-class RegisterRepositoryImpl extends RegisterRepository {
 
+class RegisterRepositoryImpl extends RegisterRepository {
   @override
   Future<RegisterResponse> register(RegisterDto registerDto, filePath) async {
     Map<String, String> headers = {
@@ -16,7 +16,7 @@ class RegisterRepositoryImpl extends RegisterRepository {
     var uri = Uri.parse('${Constant.apiUrl}auth/register/');
     var request = http.MultipartRequest('POST', uri);
 
-    request.fields['nombre'] = registerDto.nombre;  
+    request.fields['nombre'] = registerDto.nombre;
     request.fields['nick'] = registerDto.nick;
     request.fields['email'] = registerDto.email;
     request.fields['fechaNacimiento'] = registerDto.fechaNacimiento;

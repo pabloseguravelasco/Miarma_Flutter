@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -14,11 +13,12 @@ class UserRepositoryImpl extends UserRepository {
   @override
   Future<UsuarioDTO> fetchUser() async {
     String token = Constant.token;
-    final response = await _client
-        .get(Uri.parse('${Constant.apiUrl}/me'), headers: {
+    final response =
+        await _client.get(Uri.parse('${Constant.apiUrl}/me'), headers: {
       HttpHeaders.contentTypeHeader: "application/json",
       HttpHeaders.authorizationHeader: "Bearer $token"
     });
+
     if (response.statusCode == 200) {
       return UsuarioDTO.fromJson(json.decode(response.body));
     } else {
