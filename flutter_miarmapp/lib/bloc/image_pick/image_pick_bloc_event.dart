@@ -15,3 +15,12 @@ class SelectImageEvent extends ImagePickBlocEvent {
   @override
   List<Object> get props => [source];
 }
+class SaveUserEvent extends ImagePickBlocEvent{
+  final RegisterDto registerDto;
+  final String path;
+
+  const SaveUserEvent(this.registerDto,this.path);
+
+  @override
+  List<Object> get props => [registerDto,path];
+}

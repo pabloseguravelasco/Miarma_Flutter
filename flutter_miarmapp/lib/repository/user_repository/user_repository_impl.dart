@@ -1,5 +1,6 @@
-import 'dart:_http';
+
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_miarmapp/models/post_response.dart';
 import 'package:flutter_miarmapp/repository/user_repository/user_repository.dart';
@@ -14,7 +15,7 @@ class UserRepositoryImpl extends UserRepository {
   Future<UsuarioDTO> fetchUser() async {
     String token = Constant.token;
     final response = await _client
-        .get(Uri.parse('${Constant.apiUrl}/post/public'), headers: {
+        .get(Uri.parse('${Constant.apiUrl}/me'), headers: {
       HttpHeaders.contentTypeHeader: "application/json",
       HttpHeaders.authorizationHeader: "Bearer $token"
     });

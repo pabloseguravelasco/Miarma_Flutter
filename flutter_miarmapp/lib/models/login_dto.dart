@@ -1,7 +1,7 @@
 class LoginDto {
   LoginDto({
     required this.email,
-    required this.password,
+    required this.password
   });
   late final String email;
   late final String password;

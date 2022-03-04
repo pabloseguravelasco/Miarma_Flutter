@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_miarmapp/repository/register_repository/register_repository.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   late AuthRepository authRepository;
+   late RegisterRepository registerRepository;
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController nickController = TextEditingController();
@@ -29,14 +31,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  String _selectedDate = '';
-  String _dateCount = '';
-  String _range = '';
-  String _rangeCount = '';
+  
 
   @override
   void initState() {
     authRepository = AuthRepositoryImpl();
+    
+
     super.initState();
   }
 
@@ -126,10 +127,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-                                  onSaved: (String? value) {
-                                    // This optional block of code can be used to run
-                                    // code when the user saves the form.
-                                  },
                                 ),
                               ),
                               Container(
@@ -144,10 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-                                  onSaved: (String? value) {
-                                    // This optional block of code can be used to run
-                                    // code when the user saves the form.
-                                  },
+
                                 ),
                               ),
                               Container(
@@ -162,10 +156,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-                                  onSaved: (String? value) {
-                                    // This optional block of code can be used to run
-                                    // code when the user saves the form.
-                                  },
                                 ),
                               ),
                               Container(
@@ -181,10 +171,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-                                  onSaved: (String? value) {
-                                    // This optional block of code can be used to run
-                                    // code when the user saves the form.
-                                  },
                                   validator: (value) {
                                     return (value == null || value.isEmpty)
                                         ? 'Escribe una contraseña'
@@ -205,10 +191,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-                                  onSaved: (String? value) {
-                                    // This optional block of code can be used to run
-                                    // code when the user saves the form.
-                                  },
                                   validator: (value) {
                                     return (value == null || value.isEmpty)
                                         ? 'Escribe una contrasña'
@@ -216,10 +198,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   },
                                 ),
                               ),
-
-                              //Controller booleano Publicaciones
-
-                              //Controller fecha nacimiento
                               Container(
                                 margin: const EdgeInsets.only(top: 20),
                                 width: deviceWidth - 100,
@@ -253,13 +231,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   },
                                 ),
                               ),
-                              //avatar
                               Container(
                                 margin: const EdgeInsets.only(top: 20),
                                 width: deviceWidth - 100,
                                 child: BlocProvider(
                                   create: (context) {
-                                    return ImagePickBlocBloc();
+                                    return ImagePickBlocBloc(registerRepository);
                                   },
                                   child: BlocConsumer<ImagePickBlocBloc,
                                           ImagePickBlocState>(

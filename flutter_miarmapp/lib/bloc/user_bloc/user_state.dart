@@ -16,6 +16,7 @@ class UserFetched extends UserState {
   const UserFetched(this.usuarioDTO);
   @override
   List<Object> get props => [usuarioDTO];
+
 }
 
 class UserFetchedError extends UserState {

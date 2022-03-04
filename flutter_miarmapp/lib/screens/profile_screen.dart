@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_miarmapp/bloc/public_post/public_post_bloc.dart';
 import 'package:flutter_miarmapp/bloc/user_bloc/user_bloc.dart';
 import 'package:flutter_miarmapp/constants.dart';
 import 'package:flutter_miarmapp/models/post_response.dart';
+import 'package:flutter_miarmapp/repository/post_repository/post_repository.dart';
+import 'package:flutter_miarmapp/repository/post_repository/post_repository_impl.dart';
+import 'package:flutter_miarmapp/repository/user_repository/user_repository.dart';
+import 'package:flutter_miarmapp/repository/user_repository/user_repository_impl.dart';
 
-import '../bloc/login/login_bloc.dart';
-import '../bloc/public_post/public_post_bloc.dart';
-import '../preferences_utils.dart';
-import '../repository/post_repository/post_repository.dart';
-import '../repository/post_repository/post_repository_impl.dart';
 import '../widgets/error_page.dart';
-import 'menu_screen.dart';
+
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -20,11 +21,13 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late PostRepository postRepository;
+  late UserRepository userRepository;
+    late PostRepository postRepository;
 
   @override
   void initState() {
     super.initState();
+    userRepository = UserRepositoryImpl();
     postRepository = PostRepositoryImpl();
   }
 
@@ -36,11 +39,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: BlocProvider(
+      home: BlocProvider(
       create: (context) {
-        return PostsBloc(postRepository)..add(const FetchPostWithType());
+        return UserBloc(userRepository)..add(const FetchUserWithType());
       },
       child: Scaffold(body: _createSeeProfile(context)),
+      
     ));
   }
 
@@ -72,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String imageUrlAvatar =
         usuarioDTO.avatar.replaceAll("http://localhost:8080", Constant.apiUrl);
 
-    return Container(
+    return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: Container(
@@ -259,27 +263,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 60.0),
-                  Center(
-                      child: Column(children: [
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            width: 2.0,
-                            color: Color.fromARGB(255, 0, 0, 0),
-                          )),
-                      child: Icon(Icons.photo_camera_outlined,
-                          color: Color.fromARGB(255, 0, 0, 0), size: 40.0),
-                    ),
-                    SizedBox(height: 10),
-                    Text("No hay Publicaciones",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 0, 0, 0),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0)),
-                  ]))
-                ],
+             
+            
+          ],
               ),
             ),
           ],
@@ -288,7 +274,90 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showSnackbar(BuildContext context, message) {}
-
-  buildForm(BuildContext ctx) {}
+ Widget _createSeePosts(BuildContext context) {
+  return BlocBuilder<PostsBloc, PostsState>(
+    builder: (context, state) {
+      if (state is PostsInitial) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (state is PostFetchError) {
+        return ErrorPage(
+          message: state.message,
+          retry: () {
+            context.watch<PostsBloc>().add(const FetchPostWithType());
+          },
+        );
+      } else if (state is PostsFetched) {
+        return _createPublicView(context, state.posts);
+      } else {
+        return const Text('Not support');
+      }
+    },
+  );
 }
+
+Widget _createPublicView(BuildContext context, List<Post> posts) {
+  final contentWidth = MediaQuery.of(context).size.width;
+  final contentHeight = MediaQuery.of(context).size.height;
+
+  return ListView(
+    children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Text(
+              'Publicaciones',
+              style: TextStyle(
+                  color: Colors.black.withOpacity(.8),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 19),
+            ),
+          ),
+        ],
+      ),
+      SizedBox(
+        height: contentHeight - 170,
+        width: contentWidth,
+        child: ListView.separated(
+          itemBuilder: (BuildContext context, int index) {
+            return _createPublicViewItem(context, posts[index]);
+          },
+          scrollDirection: Axis.vertical,
+          separatorBuilder: (context, index) => VerticalDivider(
+            color: Colors.transparent,
+            width: contentWidth,
+          ),
+          itemCount: posts.length,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _createPublicViewItem(BuildContext context, Post post) {
+  final contentWidth = MediaQuery.of(context).size.width;
+  final contentHeight = MediaQuery.of(context).size.height;
+  String imageUrl =
+      post.ficheroAdjunto.replaceAll("http://localhost:8080", Constant.apiUrl);
+  String imageUrlAvatar =
+      post.usuario.avatar.replaceAll("http://localhost:8080", Constant.apiUrl);
+
+  return Container(
+    decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.withOpacity(.3)))),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+      
+           Image.asset(imageUrl),
+        
+      ],
+    ),
+  );
+}
+
+
+}
+
