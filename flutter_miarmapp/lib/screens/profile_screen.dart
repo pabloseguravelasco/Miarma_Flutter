@@ -11,8 +11,6 @@ import 'package:flutter_miarmapp/repository/user_repository/user_repository_impl
 
 import '../widgets/error_page.dart';
 
-
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -22,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late UserRepository userRepository;
-    late PostRepository postRepository;
+  late PostRepository postRepository;
 
   @override
   void initState() {
@@ -38,13 +36,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: BlocProvider(
+    return Scaffold(
+        body: BlocProvider(
       create: (context) {
         return UserBloc(userRepository)..add(const FetchUserWithType());
       },
       child: Scaffold(body: _createSeeProfile(context)),
-      
     ));
   }
 
@@ -263,9 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   SizedBox(height: 60.0),
-             
-            
-          ],
+                ],
               ),
             ),
           ],
@@ -274,90 +269,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
- Widget _createSeePosts(BuildContext context) {
-  return BlocBuilder<PostsBloc, PostsState>(
-    builder: (context, state) {
-      if (state is PostsInitial) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is PostFetchError) {
-        return ErrorPage(
-          message: state.message,
-          retry: () {
-            context.watch<PostsBloc>().add(const FetchPostWithType());
-          },
-        );
-      } else if (state is PostsFetched) {
-        return _createPublicView(context, state.posts);
-      } else {
-        return const Text('Not support');
-      }
-    },
-  );
-}
+  Widget _createSeePosts(BuildContext context) {
+    return BlocBuilder<PostsBloc, PostsState>(
+      builder: (context, state) {
+        if (state is PostsInitial) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is PostFetchError) {
+          return ErrorPage(
+            message: state.message,
+            retry: () {
+              context.watch<PostsBloc>().add(const FetchPostWithType());
+            },
+          );
+        } else if (state is PostsFetched) {
+          return _createPublicView(context, state.posts);
+        } else {
+          return const Text('Not support');
+        }
+      },
+    );
+  }
 
-Widget _createPublicView(BuildContext context, List<Post> posts) {
-  final contentWidth = MediaQuery.of(context).size.width;
-  final contentHeight = MediaQuery.of(context).size.height;
+  Widget _createPublicView(BuildContext context, List<Post> posts) {
+    final contentWidth = MediaQuery.of(context).size.width;
+    final contentHeight = MediaQuery.of(context).size.height;
 
-  return ListView(
-    children: <Widget>[
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: Text(
-              'Publicaciones',
-              style: TextStyle(
-                  color: Colors.black.withOpacity(.8),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 19),
+    return ListView(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Text(
+                'Publicaciones',
+                style: TextStyle(
+                    color: Colors.black.withOpacity(.8),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 19),
+              ),
             ),
+          ],
+        ),
+        SizedBox(
+          height: contentHeight - 170,
+          width: contentWidth,
+          child: ListView.separated(
+            itemBuilder: (BuildContext context, int index) {
+              return _createPublicViewItem(context, posts[index]);
+            },
+            scrollDirection: Axis.vertical,
+            separatorBuilder: (context, index) => VerticalDivider(
+              color: Colors.transparent,
+              width: contentWidth,
+            ),
+            itemCount: posts.length,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _createPublicViewItem(BuildContext context, Post post) {
+    final contentWidth = MediaQuery.of(context).size.width;
+    final contentHeight = MediaQuery.of(context).size.height;
+    String imageUrl = post.ficheroAdjunto
+        .replaceAll("http://localhost:8080", Constant.apiUrl);
+    String imageUrlAvatar = post.usuario.avatar
+        .replaceAll("http://localhost:8080", Constant.apiUrl);
+
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.withOpacity(.3)))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Image.asset(imageUrl),
         ],
       ),
-      SizedBox(
-        height: contentHeight - 170,
-        width: contentWidth,
-        child: ListView.separated(
-          itemBuilder: (BuildContext context, int index) {
-            return _createPublicViewItem(context, posts[index]);
-          },
-          scrollDirection: Axis.vertical,
-          separatorBuilder: (context, index) => VerticalDivider(
-            color: Colors.transparent,
-            width: contentWidth,
-          ),
-          itemCount: posts.length,
-        ),
-      ),
-    ],
-  );
+    );
+  }
 }
-
-Widget _createPublicViewItem(BuildContext context, Post post) {
-  final contentWidth = MediaQuery.of(context).size.width;
-  final contentHeight = MediaQuery.of(context).size.height;
-  String imageUrl =
-      post.ficheroAdjunto.replaceAll("http://localhost:8080", Constant.apiUrl);
-  String imageUrlAvatar =
-      post.usuario.avatar.replaceAll("http://localhost:8080", Constant.apiUrl);
-
-  return Container(
-    decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withOpacity(.3)))),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-      
-           Image.asset(imageUrl),
-        
-      ],
-    ),
-  );
-}
-
-
-}
-

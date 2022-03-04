@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_miarmapp/models/register_dto.dart';
 import 'package:flutter_miarmapp/repository/register_repository/register_repository.dart';
+import 'package:flutter_miarmapp/repository/register_repository/register_repository_impl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +25,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   late AuthRepository authRepository;
-   late RegisterRepository registerRepository;
+  late RegisterRepository registerRepository;
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController nickController = TextEditingController();
@@ -31,12 +33,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  
+  TextEditingController publicoController = TextEditingController();
 
   @override
   void initState() {
     authRepository = AuthRepositoryImpl();
-    
+    registerRepository = RegisterRepositoryImpl();
 
     super.initState();
   }
@@ -45,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) {
-          return LoginBloc(authRepository);
+          return ImagePickBlocBloc(registerRepository);
         },
         child: _createBody(context));
   }
@@ -55,31 +57,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Center(
         child: Container(
             padding: const EdgeInsets.all(20),
-            child: BlocConsumer<LoginBloc, LoginState>(
+            child: BlocConsumer<ImagePickBlocBloc, ImagePickBlocState>(
                 listenWhen: (context, state) {
-              return state is LoginSuccessState || state is LoginErrorState;
+              return state is SaveUserSuccessState ||
+                  state is RegisterErrorState;
             }, listener: (context, state) async {
-              if (state is LoginSuccessState) {
+              if (state is SaveUserSuccessState) {
                 final prefs = await SharedPreferences.getInstance();
-                // Shared preferences > guardo el token
-                prefs.setString('token', state.loginResponse.token);
-                prefs.setString('avatar', state.loginResponse.avatar);
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MenuScreen()),
                 );
-              } else if (state is LoginErrorState) {
+              } else if (state is RegisterErrorState) {
                 _showSnackbar(context, state.message);
               }
             }, buildWhen: (context, state) {
-              return state is LoginInitialState || state is LoginLoadingState;
+              return state is ImagePickBlocInitial ||
+                  state is RegisterLoadingState ||
+                  state is ImageSelectedSuccessState;
             }, builder: (ctx, state) {
-              if (state is LoginInitialState) {
-                return buildForm(ctx);
-              } else if (state is LoginLoadingState) {
+              if (state is ImageSelectedSuccessState) {
+                return buildForm(ctx, state.pickedFile.path);
+              } else if (state is RegisterLoadingState) {
                 return const Center(child: CircularProgressIndicator());
               } else {
-                return buildForm(ctx);
+                return buildForm(ctx, '');
               }
             })),
       ),
@@ -93,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Widget buildForm(BuildContext context) {
+  Widget buildForm(BuildContext context, String filePath) {
     double deviceWidth = MediaQuery.of(context).size.width;
     return Form(
         key: _formKey,
@@ -141,7 +144,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide:
                                               BorderSide(color: Colors.white))),
-
                                 ),
                               ),
                               Container(
@@ -236,7 +238,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 width: deviceWidth - 100,
                                 child: BlocProvider(
                                   create: (context) {
-                                    return ImagePickBlocBloc(registerRepository);
+                                    return ImagePickBlocBloc(
+                                        registerRepository);
                                   },
                                   child: BlocConsumer<ImagePickBlocBloc,
                                           ImagePickBlocState>(
@@ -263,11 +266,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 style: ElevatedButton.styleFrom(
                                                   primary: Colors.black,
                                                 ),
-                                                onPressed: () {
-                                                  // TODO el evento que debeis crear en el BLoC para
-                                                  // poder subir la imagen que tenemos guardada en
-                                                  // state.pickedFile.path
-                                                },
+                                                onPressed: () {},
                                                 child: const Text(
                                                     'Actualizar Imagen'))
                                           ]);
@@ -312,11 +311,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           GestureDetector(
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
-                                final loginDto = LoginDto(
+                                final registerDto = RegisterDto(
+                                    nombre: nombreController.text,
+                                    nick: nickController.text,
                                     email: emailController.text,
-                                    password: passwordController.text);
-                                BlocProvider.of<LoginBloc>(context)
-                                    .add(DoLoginEvent(loginDto));
+                                    password: passwordController.text,
+                                    fechaNacimiento: dateController.text,
+                                    publico: true);
+                                BlocProvider.of<ImagePickBlocBloc>(context)
+                                    .add(SaveUserEvent(registerDto, filePath));
                               }
                             },
                             child: Container(

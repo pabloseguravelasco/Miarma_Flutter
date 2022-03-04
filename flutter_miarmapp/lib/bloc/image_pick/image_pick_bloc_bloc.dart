@@ -1,15 +1,13 @@
-
 import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_miarmapp/bloc/login/login_bloc.dart';
 import 'package:flutter_miarmapp/models/register_dto.dart';
 import 'package:flutter_miarmapp/repository/auth_repository/auth_repository.dart';
 import 'package:flutter_miarmapp/repository/register_repository/register_repository.dart';
 import 'package:image_picker/image_picker.dart';
-
-
 
 part 'image_pick_bloc_event.dart';
 part 'image_pick_bloc_state.dart';
@@ -18,7 +16,7 @@ class ImagePickBlocBloc extends Bloc<ImagePickBlocEvent, ImagePickBlocState> {
   final RegisterRepository registerRepository;
   ImagePickBlocBloc(this.registerRepository) : super(ImagePickBlocInitial()) {
     on<SelectImageEvent>(_onSelectImage);
-   
+    on<SaveUserEvent>(_onSaveUser);
   }
 
   void _onSelectImage(
@@ -39,6 +37,16 @@ class ImagePickBlocBloc extends Bloc<ImagePickBlocEvent, ImagePickBlocState> {
     }
   }
 
-
-
+  void _onSaveUser(
+      SaveUserEvent event, Emitter<ImagePickBlocState> emit) async {
+    emit(RegisterLoadingState());
+    try {
+      var registerResponse =
+          registerRepository.register(event.registerDto, event.path);
+      emit(SaveUserSuccessState());
+      return;
+    } catch (e) {
+      emit(RegisterErrorState(e.toString()));
+    }
+  }
 }

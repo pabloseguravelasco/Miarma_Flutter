@@ -20,13 +20,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late AuthRepository authRepository;
   final _formKey = GlobalKey<FormState>();
-  TextEditingController emailController = TextEditingController();
+  TextEditingController nickController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     authRepository = AuthRepositoryImpl();
-    emailController.text = "pabloseguravelasco@gmail.com";
+    nickController.text = "PabloSeg";
     passwordController.text = "Pablo@123";
     super.initState();
   }
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             }, listener: (context, state) async {
               if (state is LoginSuccessState) {
                 final prefs = await SharedPreferences.getInstance();
-                
+
                 prefs.setString('token', state.loginResponse.token);
                 prefs.setString('avatar', state.loginResponse.avatar);
                 Navigator.push(
@@ -96,21 +96,16 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
             margin: const EdgeInsets.only(top: 50),
             child: TextFormField(
-              controller: emailController,
+              controller: nickController,
               decoration: const InputDecoration(
                   suffixIcon: Icon(Icons.email),
                   suffixIconColor: Colors.white,
                   hintText: 'Email',
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white))),
-              onSaved: (String? value) {
-                // This optional block of code can be used to run
-                // code when the user saves the form.
-              },
+              onSaved: (String? value) {},
               validator: (String? value) {
-                return (value == null || !value.contains('@'))
-                    ? 'Do not use the @ char.'
-                    : null;
+                return (value == null) ? 'El nick no puede estar vacio.' : null;
               },
             ),
           ),
@@ -134,29 +129,26 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              if (_formKey.currentState!.validate()) {
-                final loginDto = LoginDto(
-                    email: emailController.text,
-                    password: passwordController.text);
-                BlocProvider.of<LoginBloc>(context).add(DoLoginEvent(loginDto));
-              }
-            },
-            child: Container(
-                height: 50,
-                width: 400,
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: TextButton(
-                  child: const Text('LOG IN',
-                      style:
-                          TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-                  style: TextButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 0, 101, 233)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width / 1.5,
+              height: 30,
+              child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/');
+                    if (_formKey.currentState!.validate()) {
+                      final loginDto = LoginDto(
+                          nick: nickController.text,
+                          password: passwordController.text);
+                      BlocProvider.of<LoginBloc>(context)
+                          .add(DoLoginEvent(loginDto));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Iniciando sesión')),
+                      );
+                    }
                   },
-                )),
+                  child: Text('Iniciar Sesion')),
+            ),
           ),
           Row(
             children: <Widget>[
